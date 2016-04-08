@@ -7,8 +7,8 @@
 
 from __future__ import unicode_literals, division
 
-import sys
 import code
+import sys
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -22,6 +22,7 @@ def default_driver():
     driver.implicitly_wait(10)
     driver.set_script_timeout(20)
     return driver
+
 
 class WebLisp:
     driver_func = None
@@ -39,12 +40,18 @@ class WebLisp:
 
     def get_addtl_funcs(self):
         return {
-            'click': lambda x: x.click() if self.driver_started else None,
-            'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1]) if self.driver_started else None,
-            'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1]) if self.driver_started else None,
+            'click': lambda x: x.click() \
+                if self.driver_started \
+                else None,
+            'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1]) \
+                if self.driver_started \
+                else None,
+            'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1]) \
+                if self.driver_started \
+                else None,
             'send-keys': lambda *x: x[0].send_keys(x[1]),
-            'open': lambda x: self.driver.get(x),
-            '_shell': lambda: self.interact()
+            'open': self.driver.get,
+            '_shell': self.interact
         }
 
     def get_addtl_vars(self):
