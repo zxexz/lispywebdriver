@@ -1,4 +1,10 @@
 #! /bin/python2
+
+# (c) 2016 Eric Marriott
+# This code uses a slightly modified version of Peter Norvig's lispy.py in conjuction
+# with Selenium WebDriver to create a lispy interface for Web testing
+
+
 from __future__ import unicode_literals, division
 
 import sys
