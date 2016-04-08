@@ -8,6 +8,7 @@
 from __future__ import unicode_literals, division
 
 import sys
+import code
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -29,13 +30,21 @@ class WebLisp:
     after_load = {}
     env = lisp.global_env
 
+    def interact(self):
+        try:
+            code.interact(local=locals())
+            return True
+        except:
+            return False
+
     def get_addtl_funcs(self):
         return {
             'click': lambda x: x.click() if self.driver_started else None,
             'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1]) if self.driver_started else None,
             'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1]) if self.driver_started else None,
             'send-keys': lambda *x: x[0].send_keys(x[1]),
-            'open': lambda x: self.driver.get(x)
+            'open': lambda x: self.driver.get(x),
+            '_shell': lambda: self.interact()
         }
 
     def get_addtl_vars(self):
