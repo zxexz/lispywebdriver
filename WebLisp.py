@@ -50,8 +50,8 @@ class WebLisp:
                 if self.driver_started \
                 else None,
             'send-keys': lambda *x: x[0].send_keys(x[1]),
-            'open': self.driver.get,
-            '_shell': self.interact
+            'open': lambda x: self.driver.get(x),
+            '_shell': lambda x: self.interact(x)
         }
 
     def get_addtl_vars(self):
