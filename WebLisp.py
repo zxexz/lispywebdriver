@@ -2,10 +2,10 @@
 
 # (c) 2016 Eric Marriott
 # This code uses a slightly modified version of Peter Norvig's lispy.py in conjuction
-# with Selenium WebDriver to create a lispy interface for Web testing
+# with Selenium WebDriver to create a lisp-like interface for Web testing
 
 
-from __future__ import unicode_literals, division
+from __future__ import division
 
 import code
 import sys
@@ -34,9 +34,8 @@ class WebLisp:
     def interact(self):
         try:
             code.interact(local=locals())
-            return True
-        except:
-            return False
+        except ValueError:
+            return None
 
     def get_addtl_funcs(self):
         return {
@@ -51,7 +50,8 @@ class WebLisp:
                 else None,
             'send-keys': lambda *x: x[0].send_keys(x[1]),
             'open': lambda x: self.driver.get(x),
-            '_shell': lambda x: self.interact(x)
+            'bind-attr': lambda x: self._bind_attr(x),
+            '_shell': lambda: self.interact()
         }
 
     def get_addtl_vars(self):
@@ -97,6 +97,7 @@ class WebLisp:
             'start-driver': lambda: self.start_driver(),
             'stop-driver': lambda: self.stop_driver()
         })
+        self._gen_macros()
         self.env_update()
 
     def repl(self, prompt='WebLisp> ', inport=lisp.InPort(sys.stdin), out=sys.stdout):
@@ -112,6 +113,25 @@ class WebLisp:
                     print >> out, lisp.to_string(val)
             except Exception as e:
                 print '%s: %s' % (type(e).__name__, e)
+
+    def _gen_macros(self):
+        lisp._eval(lisp.parse('''(begin
+
+        (define-macro and (lambda args
+           (if (null? args) #t
+               (if (= (length args) 1) (car args)
+                   `(if ,(car args) (and ,@(cdr args)) #f)))))
+
+        ;; More macros can also go here
+
+        )'''), self.env)
+
+    def _bind_attr(self, name):
+        if name in self.env:
+            setattr(self, name, self.env[name])
+            return True
+        else:
+            return False
 
 
 def main():

@@ -1,3 +1,4 @@
+#! /usr/bin/python2
 ## Modified for use with WebLisp.py by Eric Marriott
 
 ################ Scheme Interpreter in Python
@@ -53,6 +54,7 @@ class Procedure(object):
 ################ parse, read, and user interaction
 
 def parse(inport):
+    # type: (object) -> object
     'Parse a program: read and expand/error-check it.'
     # Backwards compatibility: given a str, convert it to an InPort
     if isinstance(inport, str): inport = InPort(StringIO.StringIO(inport))
@@ -406,7 +408,9 @@ def expand_quasiquote(x):
         require(x[0], len(x[0]) == 2)
         return [_append, x[0][1], expand_quasiquote(x[1:])]
     else:
-        return [_cons, expand_quasiquote(x[0]), expand_quasiquote(x[1:])]
+        return [_cons, expand_quasiquote(x[0]), expand_quasiquote(x[1:])]\
+                if x[0] is not _quasiquote \
+                else expand_quasiquote(expand_quasiquote(x[1:])[1])
 
 
 def let(*args):
