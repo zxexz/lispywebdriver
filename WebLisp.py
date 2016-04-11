@@ -47,19 +47,30 @@ class WebLisp:
     def get_addtl_funcs(self):
         return {
             'click': lambda x: x.click()
-                if self.driver_started
-                else None,
+            if self.driver_started
+            else None,
             'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1])
-                if self.driver_started
-                else None,
+            if self.driver_started
+            else None,
             'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1])
-                if self.driver_started
-                else None,
+            if self.driver_started
+            else None,
             'action-chain': lambda *x: self._build_action_chain(x),
             'action-click': lambda *x: lambda y: y.click(on_element=x[0]
-                if len(x) >= 1
-                else None),
+            if len(x) >= 1
+            else None),
             'action-click-and-hold': lambda *x: lambda y: y.click_and_hold(on_element=x[0]
+            if len(x) >= 1
+            else None),
+            'action-key-down': lambda x: lambda y: y.key_down(x),
+            'action-key-up': lambda x: lambda y: y.key_up(x),
+            'action-move-to-elem': lambda x: lambda y: y.move_to_element(x),
+            'action-send-keys': lambda *x: lambda y: y.send_keys(x),
+            'action-send-keys-to-elem': lambda *x: lambda y: y.send_keys_to_element(x[0], x[1::]),
+            'action-move-by-offset': lambda *x: lambda y: y.move_by_offset(x),
+            'action-drag-and-drop-by-offset'
+            'action-move-to-elem-with-offset': lambda *x: lambda y: y.move_to_element_with_offset(x),
+            'action-release': lambda *x: lambda y: y.release(on_element=x[0]
                 if len(x) >= 1
                 else None),
             'action-context-click': lambda *x: lambda y: y.context_click(on_element=x[0]
