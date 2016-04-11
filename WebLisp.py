@@ -11,6 +11,7 @@ import code
 import sys
 
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -37,17 +38,37 @@ class WebLisp:
         except ValueError:
             return None
 
+    def _build_action_chain(self, vars):
+        a_c = ActionChains(self.driver)
+        for i in vars:
+            a_c = i(a_c)
+        return a_c
+
     def get_addtl_funcs(self):
         return {
-            'click': lambda x: x.click() \
-                if self.driver_started \
+            'click': lambda x: x.click()
+                if self.driver_started
                 else None,
-            'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1]) \
-                if self.driver_started \
+            'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1])
+                if self.driver_started
                 else None,
-            'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1]) \
-                if self.driver_started \
+            'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1])
+                if self.driver_started
                 else None,
+            'action-chain': lambda *x: self._build_action_chain(x),
+            'action-click': lambda *x: lambda y: y.click(on_element=x[0]
+                if len(x) >= 1
+                else None),
+            'action-click-and-hold': lambda *x: lambda y: y.click_and_hold(on_element=x[0]
+                if len(x) >= 1
+                else None),
+            'action-context-click': lambda *x: lambda y: y.context_click(on_element=x[0]
+                if len(x) >= 1
+                else None),
+            'action-double-click': lambda *x: lambda y: y.double_click(on_element=x[0]
+                if len(x) >= 1
+                else None),
+            'action-perform': lambda x: x.perform(),
             'send-keys': lambda *x: x[0].send_keys(x[1]),
             'open': lambda x: self.driver.get(x),
             'bind-attr': lambda x: self._bind_attr(x),
