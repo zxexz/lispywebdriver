@@ -14,6 +14,7 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
 
 import lispy as lisp
 
@@ -47,28 +48,28 @@ class WebLisp:
     def get_addtl_funcs(self):
         return {
             'click': lambda x: x.click()
-            if self.driver_started
-            else None,
+                if self.driver_started
+                else None,
             'find-elem': lambda *x: self.driver.find_element(by=x[0], value=x[1])
-            if self.driver_started
-            else None,
+                if self.driver_started
+                else None,
             'find-elems': lambda *x: self.driver.find_elements(by=x[0], value=x[1])
-            if self.driver_started
-            else None,
+                if self.driver_started
+                else None,
             'action-chain': lambda *x: self._build_action_chain(x),
             'action-click': lambda *x: lambda y: y.click(on_element=x[0]
-            if len(x) >= 1
-            else None),
+                if len(x) >= 1
+                else None),
             'action-click-and-hold': lambda *x: lambda y: y.click_and_hold(on_element=x[0]
-            if len(x) >= 1
-            else None),
+                if len(x) >= 1
+                else None),
             'action-key-down': lambda x: lambda y: y.key_down(x),
             'action-key-up': lambda x: lambda y: y.key_up(x),
             'action-move-to-elem': lambda x: lambda y: y.move_to_element(x),
             'action-send-keys': lambda *x: lambda y: y.send_keys(x),
             'action-send-keys-to-elem': lambda *x: lambda y: y.send_keys_to_element(x[0], x[1::]),
             'action-move-by-offset': lambda *x: lambda y: y.move_by_offset(x),
-            'action-drag-and-drop-by-offset'
+            'action-drag-and-drop-by-offset': lambda *x: lambda y: y.drag_and_drop_by_offset(x[0], x[1], x[2]),
             'action-move-to-elem-with-offset': lambda *x: lambda y: y.move_to_element_with_offset(x),
             'action-release': lambda *x: lambda y: y.release(on_element=x[0]
                 if len(x) >= 1
@@ -80,9 +81,17 @@ class WebLisp:
                 if len(x) >= 1
                 else None),
             'action-perform': lambda x: x.perform(),
+            'select': lambda x: Select(x),
+            'select-by-index': lambda *x: x[0].select_by_index(x[1]),
+            'select-by-visible-text': lambda *x: x[0].select_by_visible_text(x[1]),
+            'select-by-value': lambda *x: x[0].select_by_value(x[1]),
+            'str-split': lambda *x: x[0].split() if len(x) == 1 else x[0].split(x[1]),
+            'str-join': lambda *x: x[0].join(x[1]),
             'send-keys': lambda *x: x[0].send_keys(x[1]),
             'open': lambda x: self.driver.get(x),
-            'bind-attr': lambda x: self._bind_attr(x),
+            'bind-attr': lambda *x: self._bind_attr(x[0]) \
+                if len(x) == 1 \
+                else self._bind_attr(x[0], funcname=x[1]),
             '_shell': lambda: self.interact()
         }
 
@@ -158,9 +167,11 @@ class WebLisp:
 
         )'''), self.env)
 
-    def _bind_attr(self, name):
+    def _bind_attr(self, name, funcname = None):
         if name in self.env:
-            setattr(self, name, self.env[name])
+            if funcname is None:
+                funcname = name
+            setattr(self, funcname, self.env[name])
             return True
         else:
             return False
