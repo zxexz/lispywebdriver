@@ -92,8 +92,18 @@ class WebLisp:
             'bind-attr': lambda *x: self._bind_attr(x[0]) \
                 if len(x) == 1 \
                 else self._bind_attr(x[0], funcname=x[1]),
-            '_shell': lambda: self.interact()
+            '_shell': lambda: self.interact(),
+            '|': lambda *x: list(x),
+            'build-dict': lambda *x: self._build_dict(x),
+            '||': lambda *x: self._build_dict(x)
         }
+
+    def _build_dict(self, vals):
+        d = {}
+        for i in vals:
+            d[i[0]] = i[1] if len(i) == 2 \
+                else None
+        return d
 
     def get_addtl_vars(self):
         return {
