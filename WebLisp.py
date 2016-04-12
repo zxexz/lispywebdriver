@@ -26,6 +26,10 @@ def default_driver():
     return driver
 
 
+def _is_hashable(x):
+    return hasattr(x, "__hash__")
+
+
 class WebLisp:
     driver_func = None
     driver = None
@@ -89,14 +93,18 @@ class WebLisp:
             'str-join': lambda *x: x[0].join(x[1]),
             'send-keys': lambda *x: x[0].send_keys(x[1]),
             'open': lambda x: self.driver.get(x),
-            'bind-attr': lambda *x: self._bind_attr(x[0]) \
-                if len(x) == 1 \
+            'bind-attr': lambda *x: self._bind_attr(x[0])
+                if len(x) == 1
                 else self._bind_attr(x[0], funcname=x[1]),
             '_shell': lambda: self.interact(),
             '|': lambda *x: list(x),
-            'build-dict': lambda *x: self._build_dict(x),
-            '||': lambda *x: self._build_dict(x)
+            'dict-build': lambda *x: self._build_dict(x),
+            'dict-lookup': lambda *x: x[1][x[0]] \
+                if len(x) > 1 and isinstance(x[1], dict) and _is_hashable(x[0])
+                else None
         }
+
+
 
     def _build_dict(self, vals):
         d = {}
