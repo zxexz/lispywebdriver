@@ -279,9 +279,15 @@ def add_globals(self):
     })
     # some personal modifications
     self.update({
+        "!=": op.ne,
         "map": lambda *x: map(x[0], x[1]),
+        "safe-map": lambda *x: map(x[0], x[1])
+            if hasattr(x[1], "__getitem__")
+            else x[0](x[1])
+            if hasattr(x[0], "__call__")
+            else None,
         "set-repl-print-mode": lambda x: set_repl_print_mode(x),
-        "_python_eval": lambda x: eval(x)
+        "_python_eval": lambda *x: eval(x[0]) if len(x) == 1 else eval(''.join(map(str, x))) if len(x) > 1 else None
     })
     return self
 
@@ -400,7 +406,7 @@ def expand_quasiquote(x):
     '''Expand `x => "x; `,x => x; `(,@x y) => (append x y) '''
     if not is_pair(x):
         return [_quote, x]
-    require(x, x[0] is not _unquotesplicing, 'can"t splice here')
+    require(x, x[0] is not _unquotesplicing, 'can\'t splice here')
     if x[0] is _unquote:
         require(x, len(x) == 2)
         return x[1]
@@ -426,18 +432,6 @@ def let(*args):
 
 macro_table = {_let: let}  ## More macros can go here
 
-_eval(parse('''(begin
-
-(define-macro and (lambda args
-   (if (null? args) #t
-       (if (= (length args) 1) (car args)
-           `(if ,(car args) (and ,@(cdr args)) #f)))))
-
-;; More macros can also go here
-
-
-
-)'''))
 
 if __name__ == "__main__":
     repl()

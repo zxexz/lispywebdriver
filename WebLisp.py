@@ -176,12 +176,12 @@ class WebLisp:
     def _gen_macros(self):
         lisp._eval(lisp.parse('''(begin
 
-        (define-macro and (lambda args
-           (if (null? args) #t
-               (if (= (length args) 1) (car args)
-                   `(if ,(car args) (and ,@(cdr args)) #f)))))
+            (define-macro and (lambda args
+               (if (null? args) #t
+                   (if (= (length args) 1) (car args)
+                       `(if ,(car args) (and ,@(cdr args)) #f)))))
 
-        ;; More macros can also go here
+            ;; More macros can also go here
 
         )'''), self.env)
 
