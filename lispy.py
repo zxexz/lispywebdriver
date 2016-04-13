@@ -287,7 +287,12 @@ def add_globals(self):
             if hasattr(x[0], "__call__")
             else None,
         "set-repl-print-mode": lambda x: set_repl_print_mode(x),
-        "_python_eval": lambda *x: eval(x[0]) if len(x) == 1 else eval(''.join(map(str, x))) if len(x) > 1 else None
+        "_python_eval": lambda *x: eval(x[0])
+            if len(x) == 1
+            else eval(''.join(map(str, x)))
+            if len(x) > 1
+            else None,
+        "to-int": lambda x: int(x)
     })
     return self
 

@@ -90,7 +90,8 @@ class WebLisp:
             'select-by-visible-text': lambda *x: x[0].select_by_visible_text(x[1]),
             'select-by-value': lambda *x: x[0].select_by_value(x[1]),
             'str-split': lambda *x: x[0].split() if len(x) == 1 else x[0].split(x[1]),
-            'str-join': lambda *x: x[0].join(x[1]),
+            'str-replace': lambda *x: x[0].replace(x[1],x[2]),
+            'join': lambda *x: x[0].join(x[1]),
             'send-keys': lambda *x: x[0].send_keys(x[1]),
             'open': lambda x: self.driver.get(x),
             'bind-attr': lambda *x: self._bind_attr(x[0])
@@ -99,9 +100,10 @@ class WebLisp:
             '_shell': lambda: self.interact(),
             '|': lambda *x: list(x),
             'dict-build': lambda *x: self._build_dict(x),
-            'dict-lookup': lambda *x: x[1][x[0]] \
-                if len(x) > 1 and isinstance(x[1], dict) and _is_hashable(x[0])
-                else None
+            'dict-lookup': lambda *x: x[0][x[1]] \
+                if len(x) > 1 and isinstance(x[0], dict) and _is_hashable(x[0])
+                else None,
+            'elem-text': lambda x: x.text
         }
 
 
