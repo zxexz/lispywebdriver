@@ -161,15 +161,23 @@ class WebLisp:
         self._gen_macros()
         self.env_update()
 
+    def _eval(self, cmd, env=None):
+        if env is None:
+            env = self.env
+        return lisp._eval(cmd, env)
+
+    def _parse(self, cmd):
+        return lisp.parse(cmd)
+
     def repl(self, prompt='WebLisp> ', inport=lisp.InPort(sys.stdin), out=sys.stdout):
         "A prompt-read-eval-print loop."
         while True:
             try:
                 if prompt:
                     sys.stderr.write(prompt)
-                x = lisp.parse(inport)
+                x = self._parse(inport)
                 if x is lisp.eof_object: return
-                val = lisp._eval(x, self.env)
+                val = self._eval(x, self.env)
                 if val is not None and out:
                     print >> out, lisp.to_string(val)
             except Exception as e:
